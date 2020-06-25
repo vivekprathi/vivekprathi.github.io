@@ -93,8 +93,8 @@
       .mentor-name {
         margin-bottom: 20px;
         font-weight: 500;
-    font-size: 26px;
-    line-height: 1.3
+		font-size: 26px;
+		line-height: 1.3
       }
       .social-profile {
         display: flex;
@@ -158,7 +158,7 @@
     <style data-premailer="ignore">
       /* MOBILE STYLES https://help.getvero.com/articles/media-queries-in-vero/ */
     @media screen and (max-width: 480px) {
-        .mentor-intro {
+      	.mentor-intro {
           display: block !important;
         }
       }
@@ -166,18 +166,6 @@
     <style type="text/css">
     </style>
   </head>
-  <script>
-    function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-    console.log(getParameterByName('name')); 
-  </script>
   <body style="background-color: white; margin: 0 !important;">
     <table class="email-body" align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
       <!-- LOGO -->
@@ -223,9 +211,9 @@
                   </h1>
                 </div>
                 <div class="template-section" style="padding: 30px;">
-                  Hi Roger!
+                  Hi {{user.first_name}}!
                   <br>
-                  <br>We’re excited to introduce you to your mentor, Stephen Vaughan! While all of our mentors have technical chops and a passion for sharing industry insights, we put a lot of care into selecting the right mentor for each student. With that in mind, we thought you’d like to learn a bit about Stephen before your first weekly 1-on-1 call.
+                  <br>We’re excited to introduce you to your mentor, {{user.mentor_first_name}} {{user.mentor_last_name}}! While all of our mentors have technical chops and a passion for sharing industry insights, we put a lot of care into selecting the right mentor for each student. With that in mind, we thought you’d like to learn a bit about {{user.mentor_first_name}} before your first weekly 1-on-1 call.
                   <br>
                   <br>
                   Here’s to a fantastic first week! 
@@ -236,47 +224,48 @@
                 </div>
                 <div class="template-section" style="padding: 30px;">
                   <div class="mentor-intro">
-                    
-                    <img class="mentor-photo" src="https://res.cloudinary.com/springboard-images/image/upload/v1584599022/owl.jpg" alt="Mentor Photo" height="290" width="290">
-                    
+                    {% if event.mentor_image_url %}
+                    <img class="mentor-photo" src="{{event.mentor_image_url}}" alt="Mentor Photo" height="290" width="290">
+                    {% endif %}
                     <div class="mentor-details">
-                      <div class="mentor-name">Stephen Vaughan
+                      <div class="mentor-name">{{user.mentor_first_name}} {{user.mentor_last_name}}
                       </div>
-                                          
+                      {% if event.mentor_country %}                      
                       <div class="mentor-location">
-                        📍Delhi, India
+                        📍{{event.mentor_city}}{% if event.mentor_city %}, {% endif %} {{event.mentor_country}}
                       </div>
-                       
+                      {% endif %} 
                     </div>
                   </div>
-                  During my UX journey, I've lived and worked in different countries and I had the chance to collaborate with agencies and companies of all sizes, from early stage start-ups to giant techs such as Google. I believe we all can contribute to creating a positive impact in the world. Being in UX, my purpose is to understand the users so the products and interfaces we create solve real problems and make people's lives better. I have a strong interest in social impact and conscious businesses that align the human interests with the rest of the planet. I'm currently an independent UX consultant with my own consulting agency, working with clients from all over the world. I'm passionate about teaching and mentoring others who want to pursue a UX career, with the hopes to train a new generation of change makers.
+                  {{event.mentor_bio}}
                   <br>
                   <br>
                   <div style="font-size: 22px; font-weight: 500; margin-bottom: 20px;">
                     <strong>Connect before your first call! </strong>
                   </div>
+                  {% if event.mentor_linkedin_url %}
                   <div class="social-profile">
                     <img src="https://res.cloudinary.com/springboard-images/image/upload/v1592318091/linkedin-logo.png" class="social-icon" alt="linkedin-logo">
                     <div class="social-info">
                       Connect with your mentor on Linkedin.
                       <br>
-                      <a href="https://linkedin.com/in/stephen" target="_blank" rel="noopener nofollow">https://linkedin.com/in/stephen</a>
+                      <a href="{{event.mentor_linkedin_url}}" target="_blank" rel="noopener nofollow">{{event.mentor_linkedin_url}}</a>
                     </div>
                   </div>
-                  
+                  {% endif %}
                   <div class="social-profile">
                     <img src="https://res.cloudinary.com/springboard-images/image/upload/v1592318091/skype-logo.png" class="social-icon" alt="skype-logo">
                     <div class="social-info">
                       Add your mentor on Skype before your first video call.
                       <br>
-                      Stephen’s username: tony_stark
+                      {{user.mentor_first_name}}’s username: {{event.mentor_skype_username}}
                     </div>
                   </div>
                   <div class="social-profile">
                     <img src="https://res.cloudinary.com/springboard-images/image/upload/v1592318091/email-logo.png" class="social-icon" alt="email-icon">
                     <div class="social-info">
-                      Stephen’s email:
-                      <a href="mailto:stephen.vaughan@test.com">stephen.vaughan@test.com</a>
+                      {{user.mentor_first_name}}’s email:
+                      <a href="mailto:{{event.mentor_email}}">{{event.mentor_email}}</a>
                     </div>
                   </div>
                 </div>
@@ -285,12 +274,12 @@
                 </h3>
                 <div class="template-section" style="padding-bottom: 30px;">
                   <br>Your first weekly call is on 
-                  <strong>Thursday, Jun 25 @ 03:00 PM [PDT]</strong>
+                  <strong>{{user.next_mentor_call_datetime | time_zone: user.timezone | date: "%A, %b %d @ %I:%M %p [%Z]"}}</strong>
                   <br>
                   <br>Submit your agenda and join the call via your Mentor Call Tab.
                   <br>
                   <br>
-                  <a class="primary-cta" href="https://www.springboard.com/workshops/data-science-career-track/learn#/mentorCall">Open Tab</a>
+                  <a class="primary-cta" href="https://www.springboard.com/workshops/{{user.course_slug}}/learn#/mentorCall">Open Tab</a>
                   <br>
                   <br>
                   <br>
@@ -317,7 +306,7 @@
                   <!-- PERMISSION REMINDER -->
                   <tr>
                     <td align="center" style="padding: 5px 0; font-family: 'Open Sans', sans-serif; font-size: 10px; font-weight: 400; line-height: 14px;">
-                      <p style="margin: 0;">You received this email because you enrolled in Test.
+                      <p style="margin: 0;">You received this email because you enrolled in {{user.course_name}}.
                       </p>
                     </td>
                   </tr>
