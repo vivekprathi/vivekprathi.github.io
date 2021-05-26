@@ -76,7 +76,6 @@ return code;
 	    't': 100, //track
 	    'a': 100 //analyze
 	};
-	VWO.visitor({prop1: "b"});
 	</script>
 	<!-- End VWO Async SmartCode -->
 <!-- 	<script type='text/javascript'>
@@ -94,6 +93,7 @@ f=false,d=document;return{use_existing_jquery:function(){return use_existing_jqu
 
 
 </script> -->
+	<script>VWO.visitor({prop1: "b"});</script>
 
 </head>
 <body>
