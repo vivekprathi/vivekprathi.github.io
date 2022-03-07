@@ -267,7 +267,7 @@ return code;
   </head>
   <body>
     <div class="testbox">
-      <form action="/form2.html">
+      <form id="form_test" name="form_test_name" action="/form2.html">
         <div class="banner">
           <h1>New Member Registration</h1>
         </div>
@@ -347,7 +347,7 @@ return code;
         <input type="checkbox" name="checkbox1">
         <label>You consent to receive communications from us electronically. We will communicate with you by e-mail or phone. You agree that all agreements, notices, disclosures and other communications that we provide to you electronically satisfy any legal requirement that such communications be in writing.</label>
         <div class="btn-block">
-          <button type="submit" href="/">Submit</button>
+	<input type="submit" value="Submit" id="former1Btn">
 	<a href="javascript:void(0)" onclick="history.pushState(null, 'test', 'form2.html')" id='historyPush'>History Push new URL</a>
         </div>
       </form>
