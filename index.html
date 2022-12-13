@@ -76,7 +76,9 @@ return code;
 	    't': 100, //track
 	    'a': 100 //analyze
 	};
-	var _vwo_clicks = 200000; //this will track first 10 clicks
+	var _vwo_clicks = 200000;
+		window._vis_opt_queue = window._vis_opt_queue || [];
+	window._vis_opt_queue.push(function() {_vis_opt_revenue_conversion(100);});//this will track first 10 clicks
 	</script>
 	<!-- End VWO Async SmartCode -->
 <!-- 	<script type='text/javascript'>
