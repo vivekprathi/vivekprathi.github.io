@@ -206,7 +206,20 @@
       }
     </style>
 <!-- Start VWO SmartCode --> 
-<script referrerPolicy="no-referrer-when-downgrade" src="https://dev.visualwebsiteoptimizer.com/lib/935212.js" id="vwoCode"></script> 
+<script type="text/javascript">
+    const params = new URLSearchParams(window.location.search);
+    const accId = parseInt(params.get("id")); // Get account ID from URL parameters
+    const accountId = accId || 848489; // Default account ID if none is provided
+
+    // Dynamically create the script tag with the account ID
+    const script = document.createElement('script');
+    script.src = `https://dev.visualwebsiteoptimizer.com/lib/${accountId}.js`;
+    script.id = 'vwoCode';
+    script.referrerPolicy = 'no-referrer-when-downgrade';
+
+    // Append the script to the head
+    document.head.appendChild(script);
+</script>
 <!-- End VWO SmartCode -->
   </head>
   <body>
