@@ -18,7 +18,7 @@
 window._vwo_code || (function() {
     // Fetch account_id and edge from query parameters
     const params = new URLSearchParams(window.location.search);
-    const account_id = parseInt(params.get("account_id")) || 3000607; // Default to 3000607 if not provided
+    const account_id = parseInt(params.get("id")) || 3000607; // Default to 3000607 if not provided
     const useEdge = params.get("edge") === "1"; // Check if edge=1 is in the query
 
     // Determine the base domain
