@@ -1,439 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Complete Website Layout</title>
-		<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-	<link href="style.css" rel="stylesheet">
-	<!-- Start VWO Async SmartCode -->
-<link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
-<script type='text/javascript' id='vwoCode'>
-window._vwo_code || (function() {
-    // Fetch account_id and edge from query parameters
-    const params = new URLSearchParams(window.location.search);
-    const account_id = parseInt(params.get("id")) || 3000607; // Default to 3000607 if not provided
-    const useEdge = params.get("edge") === "1"; // Check if edge=1 is in the query
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vivek — Website Showcase</title>
+    <meta name="description" content="A multi-page showcase: vanilla SPAs, React microsites, and Next.js static exports." />
+    <script id="vwo-config" type="application/json">
+      {"accountId": 3001000, "useEdge": false}
+    </script>
+    <script src="/vwo/vwo-smartcode.js"></script>
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.09);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --line: rgba(255, 255, 255, 0.14);
+        --a: #78a6ff;
+        --b: #a78bfa;
+        --c: #34d399;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1000px 600px at 20% 10%, rgba(120, 166, 255, 0.18), transparent 60%),
+          radial-gradient(900px 600px at 70% 15%, rgba(167, 139, 250, 0.16), transparent 55%),
+          radial-gradient(900px 700px at 60% 85%, rgba(52, 211, 153, 0.12), transparent 55%),
+          var(--bg);
+        color: var(--text);
+        font: 500 15px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+      a { color: inherit; text-decoration: none; }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 18px 56px; }
+      header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .title {
+        display: grid;
+        gap: 6px;
+      }
+      .title h1 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+      }
+      .title p { margin: 0; color: var(--muted); max-width: 62ch; }
+      .pillrow { display: flex; gap: 8px; flex-wrap: wrap; }
+      .pill {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+      }
+      .card {
+        grid-column: span 6;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.03));
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+      }
+      .card:hover { border-color: rgba(255,255,255,0.26); }
+      .card a { display: block; padding: 16px 16px 14px; }
+      .card .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+      .badge {
+        font-size: 11px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: rgba(255,255,255,0.04);
+        white-space: nowrap;
+      }
+      .name { font-size: 16px; font-weight: 750; letter-spacing: -0.01em; margin: 0; }
+      .desc { margin: 6px 0 0; color: var(--muted); }
+      .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+      .chip {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.78);
+      }
+      .row { margin-top: 18px; display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
+      .row a.link {
+        color: var(--a);
+        border-bottom: 1px dashed rgba(120,166,255,0.55);
+      }
+      @media (max-width: 860px) { .card { grid-column: span 12; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="title">
+          <h1>Website Showcase (10 destinations)</h1>
+          <p>3 Next.js static pages, 1 React microsite, 3 vanilla SPAs — each with actions like forms, filters, state, and local persistence.</p>
+          <div class="pillrow">
+            <span class="pill">Host: GitHub Pages (free)</span>
+            <span class="pill">No backend</span>
+            <span class="pill">State via localStorage</span>
+          </div>
+        </div>
+        <div class="pillrow">
+          <a class="pill" href="/legacy/">Legacy homepage</a>
+          <a class="pill" href="/form.html">Existing form page</a>
+        </div>
+      </header>
 
-    // Determine the base domain
-    const baseDomain = useEdge 
-        ? "https://edge.visualwebsiteoptimizer.com" 
-        : "https://dev.visualwebsiteoptimizer.com";
+      <section class="grid" aria-label="Showcase sites">
+        <!-- Next.js pages (exported into /next-showcase/) -->
+        <div class="card">
+          <a href="/next-showcase/dashboard/">
+            <div class="top"><h2 class="name">NEXT — Analytics Dashboard</h2><span class="badge">Next.js (static)</span></div>
+            <p class="desc">Search + filters + interactive widgets, exported as static HTML.</p>
+            <div class="actions"><span class="chip">search</span><span class="chip">filters</span><span class="chip">widgets</span></div>
+          </a>
+        </div>
+        <div class="card">
+          <a href="/next-showcase/product/">
+            <div class="top"><h2 class="name">NEXT — Product Landing + Cart</h2><span class="badge">Next.js (static)</span></div>
+            <p class="desc">Variant picker, add-to-cart interactions, and a mini checkout flow.</p>
+            <div class="actions"><span class="chip">variants</span><span class="chip">cart</span><span class="chip">checkout</span></div>
+          </a>
+        </div>
+        <div class="card">
+          <a href="/next-showcase/portfolio/">
+            <div class="top"><h2 class="name">NEXT — Portfolio + Contact</h2><span class="badge">Next.js (static)</span></div>
+            <p class="desc">Project gallery, modal details, and contact form validation.</p>
+            <div class="actions"><span class="chip">modal</span><span class="chip">form</span><span class="chip">validation</span></div>
+          </a>
+        </div>
 
-    var version = 2.1,
-        settings_tolerance = 2000,
-        hide_element = 'body',
-        hide_element_style = 'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;transition:none !important;',
-        /* DO NOT EDIT BELOW THIS LINE */
-        f = false, w = window, d = document, v = d.querySelector('#vwoCode'), cK = '_vwo_' + account_id + '_settings', cc = {};
+        <!-- React microsite (no build step; shipped as static HTML + ESM) -->
+        <div class="card">
+          <a href="/react-microshop/">
+            <div class="top"><h2 class="name">REACT — MicroShop</h2><span class="badge">React (no build)</span></div>
+            <p class="desc">Catalog filters, cart drawer, and saved cart state.</p>
+            <div class="actions"><span class="chip">filter</span><span class="chip">cart</span><span class="chip">localStorage</span></div>
+          </a>
+        </div>
 
-    try {
-        var c = JSON.parse(localStorage.getItem('_vwo_' + account_id + '_config'));
-        cc = c && typeof c === 'object' ? c : {};
-    } catch (e) {}
+        <!-- Vanilla SPAs -->
+        <div class="card">
+          <a href="/spa-taskboard/">
+            <div class="top"><h2 class="name">SPA — Taskboard</h2><span class="badge">Vanilla SPA</span></div>
+            <p class="desc">Create tasks, drag between columns, and persist to localStorage.</p>
+            <div class="actions"><span class="chip">drag & drop</span><span class="chip">state</span><span class="chip">persistence</span></div>
+          </a>
+        </div>
+        <div class="card">
+          <a href="/spa-recipe-radar/">
+            <div class="top"><h2 class="name">SPA — Recipe Radar</h2><span class="badge">Vanilla SPA</span></div>
+            <p class="desc">Ingredient filters, favorites, and auto-generated shopping list.</p>
+            <div class="actions"><span class="chip">filters</span><span class="chip">favorites</span><span class="chip">list</span></div>
+          </a>
+        </div>
+        <div class="card">
+          <a href="/spa-trip-planner/">
+            <div class="top"><h2 class="name">SPA — Trip Planner</h2><span class="badge">Vanilla SPA</span></div>
+            <p class="desc">Build an itinerary, reorder items, and generate a printable summary.</p>
+            <div class="actions"><span class="chip">reorder</span><span class="chip">dates</span><span class="chip">print</span></div>
+          </a>
+        </div>
+      </section>
 
-    var stT = cc.stT === 'session' ? w.sessionStorage : w.localStorage;
-    code = {
-        nonce: v && v.nonce,
-        use_existing_jquery: function() { return typeof use_existing_jquery !== 'undefined' ? use_existing_jquery : undefined; },
-        library_tolerance: function() { return typeof library_tolerance !== 'undefined' ? library_tolerance : undefined; },
-        settings_tolerance: function() { return cc.sT || settings_tolerance; },
-        hide_element_style: function() { return '{' + (cc.hES || hide_element_style) + '}'; },
-        hide_element: function() {
-            if (performance.getEntriesByName('first-contentful-paint')[0]) { return ''; }
-            return typeof cc.hE === 'string' ? cc.hE : hide_element;
-        },
-        getVersion: function() { return version; },
-        finish: function(e) {
-            if (!f) {
-                f = true;
-                var t = d.getElementById('_vis_opt_path_hides');
-                if (t) t.parentNode.removeChild(t);
-                if (e) (new Image).src = `${baseDomain}/ee.gif?a=` + account_id + e;
-            }
-        },
-        finished: function() { return f; },
-        addScript: function(e) {
-            var t = d.createElement('script');
-            t.type = 'text/javascript';
-            if (e.src) { t.src = e.src; } else { t.text = e.text; }
-            v && t.setAttribute('nonce', v.nonce);
-            d.getElementsByTagName('head')[0].appendChild(t);
-        },
-        load: function(e, t) {
-            var n = this.getSettings(),
-                i = d.createElement('script'),
-                r = this;
-            t = t || {};
-            if (n) {
-                i.textContent = n;
-                d.getElementsByTagName('head')[0].appendChild(i);
-                if (!w.VWO || VWO.caE) {
-                    stT.removeItem(cK);
-                    r.load(e);
-                }
-            } else {
-                var o = new XMLHttpRequest();
-                o.open('GET', e, true);
-                o.withCredentials = !t.dSC;
-                o.responseType = t.responseType || 'text';
-                o.onload = function() {
-                    if (t.onloadCb) { return t.onloadCb(o, e); }
-                    if (o.status === 200 || o.status === 304) { _vwo_code.addScript({ text: o.responseText }); }
-                    else { _vwo_code.finish('&e=loading_failure:' + e); }
-                };
-                o.onerror = function() {
-                    if (t.onerrorCb) { return t.onerrorCb(e); }
-                    _vwo_code.finish('&e=loading_failure:' + e);
-                };
-                o.send();
-            }
-        },
-        getSettings: function() {
-            try {
-                var e = stT.getItem(cK);
-                if (!e) { return; }
-                e = JSON.parse(e);
-                if (Date.now() > e.e) { stT.removeItem(cK); return; }
-                return e.s;
-            } catch (e) { return; }
-        },
-        init: function() {
-            if (d.URL.indexOf('__vwo_disable__') > -1) return;
-            var e = this.settings_tolerance();
-            w._vwo_settings_timer = setTimeout(function() { _vwo_code.finish(); stT.removeItem(cK); }, e);
-            var t;
-            if (this.hide_element() !== 'body') {
-                t = d.createElement('style');
-                var n = this.hide_element(),
-                    i = n ? n + this.hide_element_style() : '',
-                    r = d.getElementsByTagName('head')[0];
-                t.setAttribute('id', '_vis_opt_path_hides');
-                v && t.setAttribute('nonce', v.nonce);
-                t.setAttribute('type', 'text/css');
-                if (t.styleSheet) t.styleSheet.cssText = i;
-                else t.appendChild(d.createTextNode(i));
-                r.appendChild(t);
-            } else {
-                t = d.getElementsByTagName('head')[0];
-                var i = d.createElement('div');
-                i.style.cssText = 'z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;display: block !important;';
-                i.setAttribute('id', '_vis_opt_path_hides');
-                i.classList.add('_vis_hide_layer');
-                t.parentNode.insertBefore(i, t.nextSibling);
-            }
-            var o = window._vis_opt_url || d.URL,
-                s = `${baseDomain}/j.php?a=` + account_id + '&u=' + encodeURIComponent(o) + '&vn=' + version;
-            if (w.location.search.indexOf('_vwo_xhr') !== -1) {
-                this.addScript({ src: s });
-            } else {
-                this.load(s + '&x=true');
-            }
-        }
-    };
-    w._vwo_code = code;
-    code.init();
-})();
-</script>
-<!-- End VWO Async SmartCode -->
-</head>
-<body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
-	<div class="container-fluid">
-		<a class="navbar-brand" href="#"><img src="img/logo6.jpg"></a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarResponsive">
-			<ul class="navbar-nav ml-auto">
-				<li class="nav-item active">
-					<a class="nav-link" href="#">Home</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="/form.html">Form</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="http://testdata.wingified.com/form?id=4000166">Services</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Team</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Connect</a>
-				</li>
-				<li class="nav-item active">
-					<a class="nav-link" href="#">Login</a>
-				</li>
-				
-				<li class="nav-item active">
-					<a class="nav-link" href="#">Signup</a>
-				</li>
-				
-				<li class="nav-item active">
-					<a class="nav-link" href="#">Help</a>
-				</li>
-			</ul>
-		</div>
-	</div>
-</nav>
-
-<!--- Image Slider -->
-<div id="slides" class="carousel slide">
-	<div class="carousel-inner">
-		<div class="carousel-item active">
-			<img class="image" src="img/45degreee_fabric.png" style="height: 500px;">
-			<div class="carousel-caption" style="top: 40%;">
-				<h1 class="display-2">Website</h1>
-				<h3>Complete Website Layout</h3>
-				<button type="button" class="btn btn-outline-dark btn-lg">VIEW
-				DEMO</button>
-				<button type="button" class="btn btn-primary btn-lg">Get Started</button>
-				<div class="col-12 social padding">
-					<a href="#"><i class="fab fa-facebook"></i></a>
-					<a href="#"><i class="fab fa-twitter"></i></a>
-					<a href="#"><i class="fab fa-google-plus-g"></i></a>
-					<a href="#"><i class="fab fa-instagram"></i></a>
-					<a href="#"><i class="fab fa-youtube"></i></a>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!--- Jumbotron -->
-<div class="container-fluid" data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row jumbotron">
-		<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-10">
-			<p class="lead">A web hosting service allows individuals and
-				organizations to make their website accessible via the World
-				Wide Web.</p>
-		</div>
-		<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2">
-			<a href="#"><button type="button" class="btn btn-outline-secondary
-			btn-lg">Web Hosting</button></a>
-		</div>
-	</div>
-</div>
-
-<!--- Welcome Section -->
-<div class="container-fluid padding"data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row welcome text-center">
-		<div class="col-12">
-			<h1 class="display-4">Built with ease.</h1>
-		</div>
-		<hr>
-		<div class="col-12">
-			<p class="lead">Welcome to my website tutorial!
-				Bootstrap is a free and open-source front-end library with HTML and
-				CSS based designs.</p>
-		</div>
-	</div>
-</div>
-
-<!--- Three Column Section -->
-<div class="container-fluid padding"data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row text-center padding">
-		<div class="col-xs-12 col-sm-6 col-md-4">
-			<i class="fas fa-code"></i>
-			<h3>HTML5</h3>
-			<p>Built with the latest version of HTML, HTML5.</p>
-		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4">
-			<i class="fas fa-bold"></i>
-			<h3>BOOTSTRAP</h3>
-			<p>Built with the latest version of Bootstrap, Bootstrap 4.</p>
-		</div>
-		<div class="col-xs-12 col-md-4">
-			<i class="fab fa-css3"></i>
-			<h3>CSS3</h3>
-			<p>Built with the latest version of CSS, CSS3.</p>
-		</div>
-	</div>
-	<hr class="my-4">
-</div>
-
-<!--- Two Column Section -->
-<div class="container-fluid padding"data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row padding">
-		<div class="col-md-12 col-lg-6">
-			<h2>If you build it...</h2>
-			<p>The columns will automatically stack on each other when
-				the screen is less than 576px wide.</p>
-			<p>Resize the browserwindow to see the effect. Responsive web
-				design has become more important as the amount of mobile traffic now
-				accounts for more than half of total internet traffic.</p>
-			<p>It can also display the web page differently depending on the
-				screen size or viewing device.</p>
-				<br>
-				<a href="#" class="btn btn-primary">Learn More</a>
-		</div>
-		<div class="col-lg-6">
-			<img src="img/desk.png" class="img-fluid">
-		</div>
-	</div>
-</div>
-
-<hr class="my-4">
-
-
-<!--- Meet the team -->
-<div class="container-fluid padding">
-	<div class="row welcome text-center">
-		<div class="col-12">
-			<h1 class="display-4">Meet the Team </h1>
-		</div>
-	</div>
-</div>
-
-<!--- Cards -->
-<div class="container-fluid padding" data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row padding">
-		<div class="col-md-4">
-			<div class="card">
-				<img class="card-img-top" src="img/team1.png">
-				<div class="card-body">
-					<h4 class="card-title">John Doe</h4>
-					<p class="card-text">John is an Interent
-						entrepreneur with almost 20 years of experience.
-					</p>
-					<a href="#" class="btn btn-outline-secondary">See Profile</a>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card">
-				<img class="card-img-top" src="img/team2.png">
-				<div class="card-body">
-					<h4 class="card-title">Mary Jo</h4>
-					<p class="card-text">Mary is a designer with a almost 10 years
-					of digital design experience.</p>
-					<a href="#" class="btn btn-outline-secondary">See Profile</a>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card">
-				<img class="card-img-top" src="img/team3.png">
-				<div class="card-body">
-					<h4 class="card-title">Phil Ho</h4>
-					<p class="card-text">Phil is an developer with over 5 years
-					of web development experience.</p>
-					<a href="#" class="btn btn-outline-secondary">See Profile</a>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!--- Two Column Section -->
-<div class="container-fluid padding" data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-	<div class="row padding">
-		<div class="col-md-12 col-lg-6">
-			<h2>Our Philosophy</h2>
-			<p>We know that greatness in a disruptive era requires bold
-				ambition, curious talent and a culture that believes we're
-			    smarter together.</p>
-			<p>We approach every challenge hostically, with best-in-class
-				expertise in data, creativity, media, technology, search, social and
-				more. We call this Alchemy. It has the power to build our clients'
-				brands and transform their business. And white it may seem like
-				magic, we've got it down to a science.
-			</p>
-
-		</div>
-		<div class="col-lg-6">
-			<img src="img/bootstrap2.png" class="img-fluid">
-		</div>
-	</div>
-	<hr class="my-4">
-</div>
-
-<!--- Connect -->
-<div class="container-fluid padding">
-	<div class="row text-center padding">
-		<div class="col-12">
-			<h2>Connect</h2>
-		</div>
-		<div class="col-12 social padding">
-			<a href="#"><i class="fab fa-facebook"></i></a>
-			<a href="#"><i class="fab fa-twitter"></i></a>
-			<a href="#"><i class="fab fa-google-plus-g"></i></a>
-			<a href="#"><i class="fab fa-instagram"></i></a>
-			<a href="#"><i class="fab fa-youtube"></i></a>
-		</div>
-	</div>
-</div>
-
-<!--- Footer -->
-<footer>
-	<div class="container-fluid padding" data-aos="fade-up"
-		data-aos-offset="200"
-		data-aos-delay="50"
-		data-aos-duration="1000">
-		<div class="row text-center">
-			<div class="col-md-4 pt-0">
-				<div class="footer-image">
-				<img src="img/logo6.jpg"></div>
-				<hr class="light">
-				<p>555-555-5555</p>
-				<p>email@hhemail.com</p>
-				<p>69 Street Name</p>
-				<p>City, State, 888</p>
-			</div>
-			<div class="col-md-4">
-				<hr class="light">
-				<h5>Our hours</h5>
-				<hr class="light">
-				<p>Monday: 9am - 5pm</p>
-				<p>Saturday: 10am - 4pm</p>
-				<p>Sunday: Closed</p>
-			</div>
-			<div class="col-md-4">
-				<hr class="light">
-				<h5>Service Area</h5>
-				<hr class="light">
-				<p>City, State, 900</p>
-				<p>City, State, 800</p>
-				<p>City, State, 700</p>
-				<p>City, State, 600</p>
-			</div>
-			<div class="col-12">
-				<hr class="light-100">
-				<h5>&copy; Website Learning </h5>
-			</div>
-		</div>
-	</div>
-</footer>
-
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script>
-AOS.init();
-</script>
-
-</body>
+      <div class="row">
+        <div style="color: var(--muted); font-size: 12px;">
+          Tip: each mini-site is keyboard friendly and works offline after first load.
+        </div>
+        <div style="font-size: 12px; color: var(--muted);">
+          Need more? Add another folder + link on this page.
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

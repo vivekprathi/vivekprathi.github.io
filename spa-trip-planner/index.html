@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SPA — Trip Planner</title>
+    <meta name="description" content="Vanilla SPA: build an itinerary, reorder items, and print a summary." />
+    <script id="vwo-config" type="application/json">
+      {"accountId": 3001003, "useEdge": false}
+    </script>
+    <script src="/vwo/vwo-smartcode.js"></script>
+    <style>
+      :root{
+        --bg:#070811; --panel:#0b1020; --line:rgba(255,255,255,.12);
+        --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.65);
+        --a:#a78bfa; --b:#38bdf8; --c:#34d399;
+        --shadow:0 18px 55px rgba(0,0,0,.5);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        font:500 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background:
+          radial-gradient(900px 520px at 20% 10%, rgba(167,139,250,.16), transparent 60%),
+          radial-gradient(850px 520px at 70% 20%, rgba(56,189,248,.12), transparent 55%),
+          radial-gradient(900px 620px at 50% 95%, rgba(52,211,153,.11), transparent 55%),
+          var(--bg);
+      }
+      a{color:inherit}
+      .wrap{max-width:1100px;margin:0 auto;padding:18px 14px 46px}
+      header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+      h1{margin:0;font-size:18px;letter-spacing:-.01em}
+      .sub{margin:4px 0 0;color:var(--muted);max-width:70ch}
+      .pill{border:1px solid var(--line); border-radius:999px; padding:6px 10px; color:var(--muted); font-size:12px; background:rgba(255,255,255,.03)}
+      .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+      .panel{
+        grid-column:span 12; border:1px solid var(--line); border-radius:14px;
+        background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        box-shadow:var(--shadow); overflow:hidden;
+      }
+      .top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:12px;background:rgba(0,0,0,.22);border-bottom:1px solid var(--line)}
+      input,select,button,textarea{
+        background:rgba(11,16,32,.85); border:1px solid var(--line); color:var(--text);
+        padding:10px 10px; border-radius:10px; outline:none;
+      }
+      input:focus,select:focus,textarea:focus{border-color:rgba(167,139,250,.55); box-shadow:0 0 0 3px rgba(167,139,250,.12)}
+      button{cursor:pointer}
+      button:hover{border-color:rgba(255,255,255,.25)}
+      .btnA{background:linear-gradient(135deg, rgba(167,139,250,.18), rgba(56,189,248,.10))}
+      .content{display:grid;grid-template-columns:1.35fr .65fr;gap:12px;padding:12px}
+      .it{display:grid;gap:10px}
+      .item{
+        border:1px solid rgba(255,255,255,.10); border-radius:12px;
+        background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        padding:10px;
+      }
+      .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+      .title{font-weight:760;letter-spacing:-.01em}
+      .meta{color:var(--muted);font-size:12px;margin-top:4px}
+      .k{display:inline-block;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);border-radius:999px;padding:4px 8px;color:var(--muted);font-size:12px}
+      .side{
+        border:1px solid rgba(255,255,255,.10); border-radius:12px; overflow:hidden;
+        background:rgba(11,16,32,.55);
+      }
+      .side h3{margin:0;padding:10px;border-bottom:1px solid rgba(255,255,255,.09);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+      .side .box{padding:10px;display:grid;gap:10px}
+      .small{font-size:12px;color:var(--muted)}
+      @media (max-width: 940px){
+        .content{grid-template-columns:1fr}
+      }
+      @media print{
+        body{background:#fff;color:#000}
+        .pill,.top,button{display:none !important}
+        .panel{box-shadow:none;border:0}
+        .item{break-inside:avoid}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>SPA — Trip Planner</h1>
+          <p class="sub">Add itinerary items, reorder them, and print a clean summary. Everything persists in <code>localStorage</code>.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="pill" href="/">← Showcase</a>
+          <button id="seed" class="pill" type="button">Seed</button>
+          <button id="clear" class="pill" type="button">Clear</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="top">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <input id="tripName" placeholder="Trip name (e.g. Tokyo Sprint)" style="min-width:240px" />
+            <input id="date" type="date" />
+            <select id="type" aria-label="Type">
+              <option value="flight">Flight</option>
+              <option value="hotel">Hotel</option>
+              <option value="food" selected>Food</option>
+              <option value="activity">Activity</option>
+              <option value="note">Note</option>
+            </select>
+            <input id="title" placeholder="Title" style="min-width:220px" />
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button id="add" class="btnA" type="button">Add item</button>
+            <button id="print" type="button">Print</button>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="it" id="it"></div>
+
+          <aside class="side">
+            <h3>Summary</h3>
+            <div class="box">
+              <div class="small">Use ↑/↓ to reorder. Double-click an item to edit. Items are grouped by date for printing.</div>
+              <div class="small" id="stats"></div>
+              <div style="display:grid;gap:8px">
+                <label class="small">Notes</label>
+                <textarea id="notes" rows="7" placeholder="Packing list, budgets, reminders…"></textarea>
+              </div>
+              <div class="small" id="status"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const KEY = "spa-trip-planner:v1";
+      const $ = (id) => document.getElementById(id);
+      const TYPES = { flight:"✈️ Flight", hotel:"🏨 Hotel", food:"🍜 Food", activity:"🎟️ Activity", note:"📝 Note" };
+
+      function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+      function load(){
+        try { return JSON.parse(localStorage.getItem(KEY)) || { tripName:"", notes:"", items:[] }; }
+        catch { return { tripName:"", notes:"", items:[] }; }
+      }
+      function save(s){ localStorage.setItem(KEY, JSON.stringify(s)); render(); }
+      function status(m){ $("status").textContent = m; setTimeout(() => ($("status").textContent = ""), 2200); }
+      function esc(s){ return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
+
+      function render(){
+        const s = load();
+        $("tripName").value = s.tripName || "";
+        $("notes").value = s.notes || "";
+        const root = $("it");
+        root.innerHTML = "";
+        const items = [...s.items].sort((a,b) => (a.sort - b.sort));
+        if (!items.length) {
+          const d = document.createElement("div");
+          d.className = "small";
+          d.style.color = "rgba(255,255,255,.65)";
+          d.textContent = "No itinerary items yet — add one above.";
+          root.appendChild(d);
+        }
+        for (const it of items) root.appendChild(renderItem(it));
+        const byType = items.reduce((acc, it) => (acc[it.type]=(acc[it.type]||0)+1, acc), {});
+        $("stats").innerHTML = `<span class="k">${items.length} item(s)</span> ` + Object.entries(byType).map(([k,v]) => `<span class="k">${esc(k)}: ${v}</span>`).join(" ");
+      }
+
+      function renderItem(it){
+        const el = document.createElement("article");
+        el.className = "item";
+        el.tabIndex = 0;
+        el.dataset.id = it.id;
+        el.innerHTML = `
+          <div class="row">
+            <div>
+              <div class="title">${esc(TYPES[it.type] || it.type)} — ${esc(it.title)}</div>
+              <div class="meta">${esc(it.date || "No date")} • <span class="k">${esc(it.type)}</span></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="up">↑</button>
+              <button type="button" class="down">↓</button>
+              <button type="button" class="del">Delete</button>
+            </div>
+          </div>
+        `;
+
+        el.querySelector(".up").addEventListener("click", () => bump(it.id, -1));
+        el.querySelector(".down").addEventListener("click", () => bump(it.id, +1));
+        el.querySelector(".del").addEventListener("click", () => {
+          if (!confirm("Delete this item?")) return;
+          const s = load();
+          s.items = s.items.filter(x => x.id !== it.id);
+          save(s);
+          status("Item deleted.");
+        });
+
+        el.addEventListener("dblclick", () => edit(it.id));
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); edit(it.id); }
+          if (e.key === "ArrowUp") { e.preventDefault(); bump(it.id, -1); }
+          if (e.key === "ArrowDown") { e.preventDefault(); bump(it.id, +1); }
+        });
+        return el;
+      }
+
+      function bump(id, dir){
+        const s = load();
+        const items = [...s.items].sort((a,b) => a.sort - b.sort);
+        const idx = items.findIndex(x => x.id === id);
+        const j = idx + dir;
+        if (idx === -1 || j < 0 || j >= items.length) return;
+        const a = items[idx], b = items[j];
+        const tmp = a.sort; a.sort = b.sort; b.sort = tmp;
+        s.items = items;
+        save(s);
+        status("Reordered.");
+      }
+
+      function edit(id){
+        const s = load();
+        const it = s.items.find(x => x.id === id);
+        if (!it) return;
+        const title = prompt("Edit title", it.title);
+        if (title == null) return;
+        const date = prompt("Edit date (YYYY-MM-DD) or empty", it.date || "");
+        if (date == null) return;
+        const type = prompt("Edit type (flight/hotel/food/activity/note)", it.type);
+        if (type == null) return;
+        it.title = title.trim().slice(0, 120) || it.title;
+        it.date = (date || "").trim();
+        it.type = (type || "").trim() || it.type;
+        save(s);
+        status("Item updated.");
+      }
+
+      $("add").addEventListener("click", () => {
+        const date = $("date").value;
+        const type = $("type").value;
+        const title = $("title").value.trim();
+        if (!title) return status("Title is required.");
+        const s = load();
+        const nextSort = (s.items.reduce((m, x) => Math.max(m, x.sort || 0), 0) || 0) + 1;
+        s.items.push({ id: uid(), date, type, title: title.slice(0,120), sort: nextSort });
+        $("title").value = "";
+        save(s);
+        status("Item added.");
+      });
+
+      $("tripName").addEventListener("input", () => { const s = load(); s.tripName = $("tripName").value; save(s); });
+      $("notes").addEventListener("input", () => { const s = load(); s.notes = $("notes").value; localStorage.setItem(KEY, JSON.stringify(s)); });
+
+      $("print").addEventListener("click", () => {
+        status("Opening print dialog…");
+        window.print();
+      });
+
+      $("seed").addEventListener("click", () => {
+        const s = load();
+        const base = new Date();
+        const d = (off) => new Date(base.getTime() + off*86400000).toISOString().slice(0,10);
+        s.tripName = s.tripName || "Tokyo Sprint";
+        const nextSort = (s.items.reduce((m, x) => Math.max(m, x.sort || 0), 0) || 0);
+        const demo = [
+          { date:d(1), type:"flight", title:"Flight to HND (arrive 18:40)" },
+          { date:d(1), type:"hotel", title:"Check-in: Shinjuku hotel" },
+          { date:d(2), type:"activity", title:"TeamLab Planets tickets" },
+          { date:d(2), type:"food", title:"Ramen crawl: 3 shops" },
+          { date:d(3), type:"note", title:"Buy IC card + SIM" },
+        ];
+        demo.forEach((x, i) => s.items.push({ id: uid(), ...x, sort: nextSort + i + 1 }));
+        save(s);
+        status("Seeded itinerary.");
+      });
+
+      $("clear").addEventListener("click", () => {
+        if (!confirm("Clear itinerary + notes?")) return;
+        localStorage.removeItem(KEY);
+        render();
+        status("Cleared.");
+      });
+
+      render();
+    </script>
+  </body>
+</html>

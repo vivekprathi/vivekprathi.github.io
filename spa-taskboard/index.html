@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SPA — Taskboard</title>
+    <meta name="description" content="Vanilla SPA taskboard with drag-and-drop and local persistence." />
+    <script id="vwo-config" type="application/json">
+      {"accountId": 3001001, "useEdge": false}
+    </script>
+    <script src="/vwo/vwo-smartcode.js"></script>
+    <style>
+      :root{
+        --bg:#0b0f19; --panel:#111827; --panel2:#0f172a; --line:#223047;
+        --text:#e5e7eb; --muted:#94a3b8; --a:#60a5fa; --ok:#34d399; --warn:#f59e0b; --bad:#f87171;
+        --shadow:0 18px 50px rgba(0,0,0,.45);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        font:500 14px/1.4 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background:
+          radial-gradient(900px 520px at 20% 0%, rgba(96,165,250,.18), transparent 60%),
+          radial-gradient(700px 420px at 80% 10%, rgba(52,211,153,.12), transparent 55%),
+          var(--bg);
+      }
+      a{color:inherit}
+      .wrap{max-width:1100px;margin:0 auto;padding:18px 14px 40px}
+      header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+      h1{margin:0;font-size:18px;letter-spacing:-.01em}
+      .sub{margin:4px 0 0;color:var(--muted);max-width:70ch}
+      .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+      .btn{
+        border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text);
+        padding:9px 10px; border-radius:10px; cursor:pointer;
+      }
+      .btn:hover{border-color:rgba(255,255,255,.28)}
+      .btn.primary{background:linear-gradient(135deg, rgba(96,165,250,.22), rgba(52,211,153,.14));}
+      .pill{border:1px solid var(--line); border-radius:999px; padding:6px 10px; color:var(--muted); font-size:12px; background:rgba(255,255,255,.03)}
+      .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+      .panel{
+        grid-column:span 12; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+        background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        box-shadow:var(--shadow);
+      }
+      .form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;padding:12px;background:rgba(0,0,0,.22);border-bottom:1px solid var(--line)}
+      input,select{
+        width:100%; background:rgba(17,24,39,.85); border:1px solid var(--line); color:var(--text);
+        padding:10px 10px; border-radius:10px; outline:none;
+      }
+      input:focus,select:focus{border-color:rgba(96,165,250,.6); box-shadow:0 0 0 3px rgba(96,165,250,.12)}
+      .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px}
+      .col{
+        background:rgba(15,23,42,.65); border:1px solid rgba(255,255,255,.08);
+        border-radius:12px; min-height:420px; display:flex; flex-direction:column;
+      }
+      .col h2{
+        margin:0; padding:10px 10px 8px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+        display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,.08);
+      }
+      .drop{padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
+      .card{
+        border:1px solid rgba(255,255,255,.10); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        border-radius:12px; padding:10px; cursor:grab; user-select:none;
+      }
+      .card:active{cursor:grabbing}
+      .meta{display:flex;justify-content:space-between;gap:8px; margin-top:8px; color:var(--muted); font-size:12px}
+      .tag{padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03)}
+      .tag.p0{color:var(--ok)} .tag.p1{color:var(--warn)} .tag.p2{color:var(--bad)}
+      .drop.over{outline:2px dashed rgba(96,165,250,.55); outline-offset:-6px}
+      .footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+      @media (max-width: 900px){
+        .form{grid-template-columns:1fr; }
+        .cols{grid-template-columns:1fr;}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>SPA — Taskboard</h1>
+          <p class="sub">Add tasks, drag between columns, and reload — your board persists via <code>localStorage</code>.</p>
+        </div>
+        <div class="bar">
+          <a class="pill" href="/">← Showcase</a>
+          <button class="btn" id="seedBtn" type="button">Seed demo tasks</button>
+          <button class="btn" id="clearBtn" type="button">Clear board</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <form class="form" id="newForm">
+          <input id="title" required maxlength="80" placeholder="Task title (e.g. Fix checkout copy)" />
+          <select id="prio" aria-label="Priority">
+            <option value="p0">P0</option>
+            <option value="p1" selected>P1</option>
+            <option value="p2">P2</option>
+          </select>
+          <select id="col" aria-label="Column">
+            <option value="todo" selected>To do</option>
+            <option value="doing">Doing</option>
+            <option value="done">Done</option>
+          </select>
+          <button class="btn primary" type="submit">Add task</button>
+        </form>
+
+        <div class="cols">
+          <section class="col" data-col="todo">
+            <h2><span>To do</span> <span class="pill" id="count-todo">0</span></h2>
+            <div class="drop" id="drop-todo"></div>
+          </section>
+          <section class="col" data-col="doing">
+            <h2><span>Doing</span> <span class="pill" id="count-doing">0</span></h2>
+            <div class="drop" id="drop-doing"></div>
+          </section>
+          <section class="col" data-col="done">
+            <h2><span>Done</span> <span class="pill" id="count-done">0</span></h2>
+            <div class="drop" id="drop-done"></div>
+          </section>
+        </div>
+
+        <div class="footer">
+          <div><strong>Actions</strong>: drag cards, double-click to edit title, press Delete to remove selected card.</div>
+          <div id="status">Ready.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const KEY = "spa-taskboard:v1";
+      const $ = (id) => document.getElementById(id);
+      const state = { selectedId: null };
+
+      function uid() { return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY)) || { todo: [], doing: [], done: [] }; }
+        catch { return { todo: [], doing: [], done: [] }; }
+      }
+      function save(board) { localStorage.setItem(KEY, JSON.stringify(board)); }
+
+      function tagLabel(p){ return p === "p0" ? "P0" : p === "p1" ? "P1" : "P2"; }
+      function colLabel(c){ return c === "todo" ? "To do" : c === "doing" ? "Doing" : "Done"; }
+
+      function render() {
+        const board = load();
+        for (const c of ["todo","doing","done"]) {
+          const drop = $("drop-" + c);
+          drop.innerHTML = "";
+          for (const t of board[c]) drop.appendChild(renderCard(t, c));
+          $("count-" + c).textContent = String(board[c].length);
+        }
+      }
+
+      function renderCard(task, col) {
+        const el = document.createElement("article");
+        el.className = "card";
+        el.draggable = true;
+        el.tabIndex = 0;
+        el.dataset.id = task.id;
+        el.dataset.col = col;
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div style="font-weight:700;letter-spacing:-.01em">${escapeHtml(task.title)}</div>
+            <span class="tag ${task.prio}">${tagLabel(task.prio)}</span>
+          </div>
+          <div class="meta">
+            <span class="tag">${colLabel(col)}</span>
+            <span>${new Date(task.createdAt).toLocaleString()}</span>
+          </div>
+        `;
+        el.addEventListener("click", () => select(task.id, el));
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); select(task.id, el); }
+        });
+        el.addEventListener("dblclick", async () => {
+          const next = prompt("Edit task title", task.title);
+          if (next == null) return;
+          updateTask(task.id, (t) => ({ ...t, title: next.trim().slice(0,80) || t.title }));
+          status(`Renamed task.`);
+        });
+
+        el.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", JSON.stringify({ id: task.id, from: col }));
+          e.dataTransfer.effectAllowed = "move";
+          status("Dragging…");
+        });
+        el.addEventListener("dragend", () => status("Ready."));
+
+        return el;
+      }
+
+      function select(id, el) {
+        state.selectedId = id;
+        document.querySelectorAll(".card").forEach(n => n.style.outline = "none");
+        el.style.outline = "2px solid rgba(96,165,250,.65)";
+        status("Selected task.");
+      }
+
+      function updateTask(id, fn) {
+        const board = load();
+        for (const c of ["todo","doing","done"]) {
+          const i = board[c].findIndex(t => t.id === id);
+          if (i !== -1) { board[c][i] = fn(board[c][i]); save(board); render(); return; }
+        }
+      }
+
+      function removeTask(id) {
+        const board = load();
+        for (const c of ["todo","doing","done"]) {
+          const before = board[c].length;
+          board[c] = board[c].filter(t => t.id !== id);
+          if (board[c].length !== before) { save(board); render(); return true; }
+        }
+        return false;
+      }
+
+      function moveTask(id, from, to) {
+        if (from === to) return;
+        const board = load();
+        const i = board[from].findIndex(t => t.id === id);
+        if (i === -1) return;
+        const [task] = board[from].splice(i, 1);
+        board[to].unshift(task);
+        save(board);
+        render();
+      }
+
+      function status(msg) { $("status").textContent = msg; }
+      function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
+
+      // Drop zones
+      for (const col of ["todo","doing","done"]) {
+        const dz = $("drop-" + col);
+        dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("over"); e.dataTransfer.dropEffect = "move"; });
+        dz.addEventListener("dragleave", () => dz.classList.remove("over"));
+        dz.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dz.classList.remove("over");
+          try {
+            const { id, from } = JSON.parse(e.dataTransfer.getData("text/plain"));
+            moveTask(id, from, col);
+            status(`Moved task to ${colLabel(col)}.`);
+          } catch {
+            status("Drop failed.");
+          }
+        });
+      }
+
+      // Add task
+      $("newForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = $("title").value.trim();
+        const prio = $("prio").value;
+        const col = $("col").value;
+        if (!title) return;
+        const board = load();
+        board[col].unshift({ id: uid(), title: title.slice(0,80), prio, createdAt: Date.now() });
+        save(board);
+        $("title").value = "";
+        render();
+        status("Task added.");
+      });
+
+      // Seed / Clear
+      $("seedBtn").addEventListener("click", () => {
+        const board = load();
+        const now = Date.now();
+        const demo = [
+          { title: "Write crisp homepage headline", prio: "p1", col: "todo" },
+          { title: "Investigate bounce rate spike", prio: "p0", col: "doing" },
+          { title: "Ship accessibility fixes", prio: "p1", col: "todo" },
+          { title: "Close support ticket backlog", prio: "p2", col: "doing" },
+          { title: "Publish March release notes", prio: "p2", col: "done" },
+        ];
+        for (const d of demo) board[d.col].unshift({ id: uid(), title: d.title, prio: d.prio, createdAt: now - Math.floor(Math.random()*86400000) });
+        save(board);
+        render();
+        status("Seeded demo tasks.");
+      });
+      $("clearBtn").addEventListener("click", () => {
+        if (!confirm("Clear the whole board?")) return;
+        localStorage.removeItem(KEY);
+        render();
+        status("Board cleared.");
+      });
+
+      // Delete key
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Delete" || !state.selectedId) return;
+        if (removeTask(state.selectedId)) {
+          state.selectedId = null;
+          status("Task deleted.");
+        }
+      });
+
+      render();
+    </script>
+  </body>
+</html>
