@@ -81,6 +81,8 @@
       import { createRoot } from "https://esm.sh/react-dom@19.2.3/client";
 
       const CART_KEY = "react-microshop:cart:v1";
+      const COUPON_KEY = "react-microshop:coupon:v1";
+      const CHECKOUT_KEY = "react-microshop:checkout:v1";
       const PRODUCTS = [
         { id:"p1", name:"Cloud Keyboard", price:129, tags:["desk","mechanical","quiet"], rating:4.7 },
         { id:"p2", name:"Studio Headphones", price:199, tags:["audio","wireless","anc"], rating:4.9 },
@@ -95,10 +97,28 @@
       const saveCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
 
       function Drawer({ open, onClose, cart, setCart }){
+        const [couponInput, setCouponInput] = useState("");
+        const [coupon, setCoupon] = useState(() => {
+          try { return localStorage.getItem(COUPON_KEY) || ""; } catch { return ""; }
+        });
+        const [checkout, setCheckout] = useState(() => {
+          try { return JSON.parse(localStorage.getItem(CHECKOUT_KEY)) || { name:"", email:"", address:"" }; } catch { return { name:"", email:"", address:"" }; }
+        });
+
+        useEffect(() => { try { localStorage.setItem(COUPON_KEY, coupon); } catch {} }, [coupon]);
+        useEffect(() => { try { localStorage.setItem(CHECKOUT_KEY, JSON.stringify(checkout)); } catch {} }, [checkout]);
+
         const lines = Object.entries(cart)
           .map(([id, qty]) => ({ product: PRODUCTS.find(p => p.id === id), qty }))
           .filter(x => x.product && x.qty > 0);
-        const total = lines.reduce((s, l) => s + l.product.price * l.qty, 0);
+        const subtotal = lines.reduce((s, l) => s + l.product.price * l.qty, 0);
+        const discount = (() => {
+          const c = coupon.trim().toUpperCase();
+          if (c === "SAVE10") return Math.round(subtotal * 0.10);
+          if (c === "FREESHIP") return 12;
+          return 0;
+        })();
+        const total = Math.max(0, subtotal - discount);
         if (!open) return null;
         return (
           <div className="drawer" role="dialog" aria-modal="true">
@@ -130,10 +150,46 @@
                       </div>
                     ))}
                     <div className="line" style={{justifyContent:"space-between"}}>
+                      <strong>Subtotal</strong>
+                      <strong>{money(subtotal)}</strong>
+                    </div>
+                    <div className="line" style={{justifyContent:"space-between"}}>
+                      <div style={{display:"flex", gap:8, alignItems:"center"}}>
+                        <span className="muted" style={{fontWeight:700}}>Coupon</span>
+                        <span className="tag">{coupon ? coupon.toUpperCase() : "none"}</span>
+                      </div>
+                      <strong>-{money(discount)}</strong>
+                    </div>
+                    <div className="line" style={{justifyContent:"space-between"}}>
                       <strong>Total</strong>
                       <strong>{money(total)}</strong>
                     </div>
-                    <button className="btn primary" onClick={() => alert("Checkout simulated (static site).")}>Checkout</button>
+
+                    <div className="line" style={{alignItems:"stretch", gap:10}}>
+                      <div style={{flex:1}}>
+                        <div className="muted" style={{fontSize:12, marginBottom:6}}>Try coupons: <strong>SAVE10</strong> or <strong>FREESHIP</strong></div>
+                        <input value={couponInput} onChange={(e) => setCouponInput(e.target.value)} placeholder="Enter coupon" />
+                      </div>
+                      <button className="btn" onClick={() => { const c=couponInput.trim().toUpperCase(); if(!c) return; setCoupon(c); setCouponInput(""); }}>Apply</button>
+                      <button className="btn" onClick={() => setCoupon("")}>Clear</button>
+                    </div>
+
+                    <div className="line" style={{display:"grid", gap:10}}>
+                      <div style={{fontWeight:900}}>Checkout (static)</div>
+                      <div style={{display:"grid", gap:8}}>
+                        <input value={checkout.name} onChange={(e) => setCheckout(s => ({...s, name: e.target.value}))} placeholder="Full name" />
+                        <input value={checkout.email} onChange={(e) => setCheckout(s => ({...s, email: e.target.value}))} placeholder="Email" />
+                        <input value={checkout.address} onChange={(e) => setCheckout(s => ({...s, address: e.target.value}))} placeholder="Address" />
+                      </div>
+                      <button className="btn primary" onClick={() => {
+                        if (!checkout.name.trim() || !checkout.email.includes("@") || !checkout.address.trim()) {
+                          alert("Please fill name, email, and address.");
+                          return;
+                        }
+                        alert(`Order placed (simulated)\\n\\nName: ${checkout.name}\\nEmail: ${checkout.email}\\nTotal: ${money(total)}`);
+                      }}>Place order</button>
+                    </div>
+
                     <button className="btn" onClick={() => { if (confirm("Clear cart?")) setCart({}); }}>Clear cart</button>
                   </>
                 )}
